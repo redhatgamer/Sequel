@@ -18,5 +18,8 @@ Marcelo Hernandez Lopez
 ## Project Structure
 
 database/ – database schema, sample data, and SQL queries
+
 backend/ – Python code connecting to the SQLite database
+
 ui/ – user interface
+
