@@ -1,6 +1,8 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- address table
 CREATE TABLE Address (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     street VARCHAR(100) NOT NULL,
     city VARCHAR(50) NOT NULL,
     postal_code INT NOT NULL,
@@ -11,7 +13,7 @@ CREATE TABLE Address (
 
 -- person table
 CREATE TABLE Person (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     shipping_address_id UUID,
     billing_address_id UUID,
     first_name VARCHAR(50) NOT NULL,
@@ -24,7 +26,7 @@ CREATE TABLE Person (
 
 -- supplier table
 CREATE TABLE Supplier (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(100),
     email VARCHAR(100),
     phone VARCHAR(20)
@@ -32,7 +34,7 @@ CREATE TABLE Supplier (
 
 -- warehouse table
 CREATE TABLE Warehouse (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     code VARCHAR(50) UNIQUE,
     address_id UUID,
     FOREIGN KEY (address_id) REFERENCES Address(id)
@@ -40,7 +42,7 @@ CREATE TABLE Warehouse (
 
 -- employee table
 CREATE TABLE Employee (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     person_id UUID,
     warehouse_id UUID,
     role VARCHAR(50),
@@ -51,7 +53,7 @@ CREATE TABLE Employee (
 
 -- storage location table
 CREATE TABLE StorageLocation (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     warehouse_id UUID,
     aisle VARCHAR(10),
     shelf VARCHAR(10),
@@ -59,9 +61,9 @@ CREATE TABLE StorageLocation (
     FOREIGN KEY (warehouse_id) REFERENCES Warehouse(id)
 );
 
--- Inventory item table
+-- inventory item table
 CREATE TABLE InventoryItem (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     sku VARCHAR(50) UNIQUE,
     name VARCHAR(100),
     quantity_on_hand INT,
@@ -74,9 +76,9 @@ CREATE TABLE InventoryItem (
     FOREIGN KEY (supplier_id) REFERENCES Supplier(id)
 );
 
--- Purchase order 
+-- purchase order
 CREATE TABLE PurchaseOrder (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     order_date TIMESTAMP,
     status VARCHAR(50),
     total_cost DECIMAL(10,2),
@@ -88,7 +90,7 @@ CREATE TABLE PurchaseOrder (
 
 -- sale table
 CREATE TABLE Sale (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     customer_id UUID,
     date TIMESTAMP,
     total DECIMAL(10,2),
@@ -97,7 +99,7 @@ CREATE TABLE Sale (
 
 -- sale item table
 CREATE TABLE SaleItem (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     sale_id UUID,
     item_id UUID,
     quantity INT,
@@ -108,7 +110,7 @@ CREATE TABLE SaleItem (
 
 -- refund table
 CREATE TABLE Refund (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     sale_id UUID,
     date TIMESTAMP,
     total DECIMAL(10,2),

@@ -40,7 +40,7 @@ SELECT
     inventoryitem.quantity_on_hand
 FROM inventoryitem
 JOIN supplier ON inventoryitem.supplier_id = supplier.id
-WHERE supplier.name = 'tech supplies inc';
+WHERE supplier.name = 'Tech Supplies Inc';
 
 
 -- sales history
