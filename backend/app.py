@@ -1,10 +1,10 @@
 import psycopg2
 
 def get_inventory():
-    # replace "ashleyprado" with your local postgreSQL username
+    # replace "username" with your local postgreSQL username
     conn = psycopg2.connect(
         dbname="sequel",
-        user="ashleyprado",
+        user="username",
         host="localhost",
         port="5432"
     )
