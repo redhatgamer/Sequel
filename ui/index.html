@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sequel - Warehouse Inventory Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f5f7;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        header h1 {
+            color: #000;
+            font-size: 3.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        header p {
+            color: #666;
+            font-size: 1.2em;
+            font-weight: 400;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 40px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            color: #666;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .tab-button:hover {
+            color: #000;
+        }
+
+        .tab-button.active {
+            color: #000;
+            background: #e8e8eb;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .tab-content h2 {
+            color: #000;
+            margin-bottom: 30px;
+            font-size: 2.4em;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table thead {
+            background: transparent;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        table th {
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 80px 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 2px solid #e0e0e0;
+            border-top: 2px solid #000;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fff5f5;
+            color: #d32f2f;
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            border-color: #d0d0d0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-card h3 {
+            font-size: 2.8em;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .stat-card p {
+            font-size: 0.95em;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            color: #999;
+        }
+
+        .empty-state p {
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sequel</h1>
+            <p>Warehouse Inventory Management System</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('dashboard')">Dashboard</button>
+            <button class="tab-button" onclick="switchTab('inventory')">Inventory</button>
+            <button class="tab-button" onclick="switchTab('warehouses')">Warehouses</button>
+            <button class="tab-button" onclick="switchTab('suppliers')">Suppliers</button>
+            <button class="tab-button" onclick="switchTab('storage')">Storage Locations</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <h2>Dashboard</h2>
+            <div class="stats" id="statsContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading dashboard...
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Tab -->
+        <div id="inventory" class="tab-content">
+            <h2>Inventory Items</h2>
+            <div id="inventoryContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading inventory...
+                </div>
+            </div>
+        </div>
+
+        <!-- Warehouses Tab -->
+        <div id="warehouses" class="tab-content">
+            <h2>Warehouses</h2>
+            <div id="warehousesContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading warehouses...
+                </div>
+            </div>
+        </div>
+
+        <!-- Suppliers Tab -->
+        <div id="suppliers" class="tab-content">
+            <h2>Suppliers</h2>
+            <div id="suppliersContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading suppliers...
+                </div>
+            </div>
+        </div>
+
+        <!-- Storage Locations Tab -->
+        <div id="storage" class="tab-content">
+            <h2>Storage Locations</h2>
+            <div id="storageContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading storage locations...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+
+        async function loadData() {
+            await Promise.all([
+                loadInventory(),
+                loadWarehouses(),
+                loadSuppliers(),
+                loadStorageLocations()
+            ]);
+            loadDashboard();
+        }
+
+        async function loadInventory() {
+            try {
+                const response = await fetch(`${API_URL}/inventory`);
+                if (!response.ok) throw new Error('Failed to load inventory');
+                const data = await response.json();
+                renderInventory(data);
+            } catch (error) {
+                document.getElementById('inventoryContainer').innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function loadWarehouses() {
+            try {
+                const response = await fetch(`${API_URL}/warehouses`);
+                if (!response.ok) throw new Error('Failed to load warehouses');
+                const data = await response.json();
+                renderWarehouses(data);
+            } catch (error) {
+                document.getElementById('warehousesContainer').innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function loadSuppliers() {
+            try {
+                const response = await fetch(`${API_URL}/suppliers`);
+                if (!response.ok) throw new Error('Failed to load suppliers');
+                const data = await response.json();
+                renderSuppliers(data);
+            } catch (error) {
+                document.getElementById('suppliersContainer').innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function loadStorageLocations() {
+            try {
+                const response = await fetch(`${API_URL}/storage-locations`);
+                if (!response.ok) throw new Error('Failed to load storage locations');
+                const data = await response.json();
+                renderStorageLocations(data);
+            } catch (error) {
+                document.getElementById('storageContainer').innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+
+        function renderInventory(data) {
+            if (data.length === 0) {
+                document.getElementById('inventoryContainer').innerHTML = '<div class="empty-state"><p>No inventory items found</p></div>';
+                return;
+            }
+
+            let html = '<table><thead><tr><th>SKU</th><th>Name</th><th>Quantity</th><th>Unit Price</th><th>Total Value</th></tr></thead><tbody>';
+            data.forEach(item => {
+                const totalValue = item.quantity_on_hand * item.unit_price;
+                html += `<tr>
+                    <td>${item.sku}</td>
+                    <td>${item.name}</td>
+                    <td>${item.quantity_on_hand}</td>
+                    <td>$${item.unit_price.toFixed(2)}</td>
+                    <td>$${totalValue.toFixed(2)}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            document.getElementById('inventoryContainer').innerHTML = html;
+        }
+
+        function renderWarehouses(data) {
+            if (data.length === 0) {
+                document.getElementById('warehousesContainer').innerHTML = '<div class="empty-state"><p>No warehouses found</p></div>';
+                return;
+            }
+
+            let html = '<table><thead><tr><th>Code</th><th>Street</th><th>City</th><th>State</th></tr></thead><tbody>';
+            data.forEach(warehouse => {
+                html += `<tr>
+                    <td>${warehouse.code || 'N/A'}</td>
+                    <td>${warehouse.street || 'N/A'}</td>
+                    <td>${warehouse.city || 'N/A'}</td>
+                    <td>${warehouse.state || 'N/A'}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            document.getElementById('warehousesContainer').innerHTML = html;
+        }
+
+        function renderSuppliers(data) {
+            if (data.length === 0) {
+                document.getElementById('suppliersContainer').innerHTML = '<div class="empty-state"><p>No suppliers found</p></div>';
+                return;
+            }
+
+            let html = '<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th></tr></thead><tbody>';
+            data.forEach(supplier => {
+                html += `<tr>
+                    <td>${supplier.name || 'N/A'}</td>
+                    <td>${supplier.email || 'N/A'}</td>
+                    <td>${supplier.phone || 'N/A'}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            document.getElementById('suppliersContainer').innerHTML = html;
+        }
+
+        function renderStorageLocations(data) {
+            if (data.length === 0) {
+                document.getElementById('storageContainer').innerHTML = '<div class="empty-state"><p>No storage locations found</p></div>';
+                return;
+            }
+
+            let html = '<table><thead><tr><th>Warehouse</th><th>Aisle</th><th>Shelf</th><th>Bin</th></tr></thead><tbody>';
+            data.forEach(location => {
+                html += `<tr>
+                    <td>${location.warehouse_code || 'N/A'}</td>
+                    <td>${location.aisle || 'N/A'}</td>
+                    <td>${location.shelf || 'N/A'}</td>
+                    <td>${location.bin || 'N/A'}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            document.getElementById('storageContainer').innerHTML = html;
+        }
+
+        async function loadDashboard() {
+            try {
+                const [inventory, warehouses, suppliers, locations] = await Promise.all([
+                    fetch(`${API_URL}/inventory`).then(r => r.json()),
+                    fetch(`${API_URL}/warehouses`).then(r => r.json()),
+                    fetch(`${API_URL}/suppliers`).then(r => r.json()),
+                    fetch(`${API_URL}/storage-locations`).then(r => r.json())
+                ]);
+
+                const totalValue = inventory.reduce((sum, item) => sum + (item.quantity_on_hand * item.unit_price), 0);
+
+                let html = `
+                    <div class="stat-card">
+                        <h3>${inventory.length}</h3>
+                        <p>Total Inventory Items</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>${inventory.reduce((sum, item) => sum + item.quantity_on_hand, 0)}</h3>
+                        <p>Total Units in Stock</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>$${totalValue.toFixed(2)}</h3>
+                        <p>Total Inventory Value</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>${warehouses.length}</h3>
+                        <p>Active Warehouses</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>${suppliers.length}</h3>
+                        <p>Registered Suppliers</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>${locations.length}</h3>
+                        <p>Storage Locations</p>
+                    </div>
+                `;
+
+                document.getElementById('statsContainer').innerHTML = html;
+            } catch (error) {
+                document.getElementById('statsContainer').innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Load data when page loads
+        window.addEventListener('load', loadData);
+    </script>
+</body>
+</html>
