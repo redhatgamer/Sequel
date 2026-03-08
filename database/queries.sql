@@ -137,3 +137,32 @@ FROM
   LEFT JOIN employee ON warehouse.id = employee.warehouse_id
 WHERE
   sale.date > NOW () - INTERVAL '30 days';
+
+-- purchase order status report with supplier and warehouse details
+SELECT
+  purchaseorder.id AS order_id,
+  purchaseorder.order_date,
+  purchaseorder.status,
+  purchaseorder.total_cost,
+  supplier.name AS supplier_name,
+  supplier.email AS supplier_email,
+  warehouse.code AS destination_warehouse,
+  COUNT(inventoryitem.id) AS items_from_supplier,
+  SUM(inventoryitem.quantity_on_hand) AS total_units_in_stock
+FROM
+  purchaseorder
+  JOIN supplier ON purchaseorder.supplier_id = supplier.id
+  JOIN warehouse ON purchaseorder.warehouse_id = warehouse.id
+  LEFT JOIN inventoryitem 
+    ON inventoryitem.supplier_id = supplier.id
+    AND inventoryitem.warehouse_id = warehouse.id
+GROUP BY
+  purchaseorder.id,
+  purchaseorder.order_date,
+  purchaseorder.status,
+  purchaseorder.total_cost,
+  supplier.name,
+  supplier.email,
+  warehouse.code
+ORDER BY
+  purchaseorder.order_date DESC;

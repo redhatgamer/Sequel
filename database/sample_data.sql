@@ -249,3 +249,21 @@ VALUES
     1,
     899.99
   );
+
+-- orders
+INSERT INTO PurchaseOrder (order_date, status, total_cost, supplier_id, warehouse_id)
+VALUES
+  (
+    NOW() - INTERVAL '10 days',
+    'received',
+    22474.75,
+    (SELECT id FROM Supplier WHERE name = 'Tech Supplies Inc'),
+    (SELECT id FROM Warehouse LIMIT 1)
+  ),
+  (
+    NOW() - INTERVAL '2 days',
+    'pending',
+    4999.00,
+    (SELECT id FROM Supplier WHERE name = 'Warehouse Parts Co'),
+    (SELECT id FROM Warehouse LIMIT 1)
+  );
