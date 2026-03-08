@@ -23,3 +23,45 @@ backend/ – Python code connecting to the SQLite database
 
 ui/ – user interface
 
+# Requirements
+
+-Python 3
+-PostgreSQL
+-psycopg2 Python library
+
+# Setup Instructions
+1. Install the required Python library
+```bash
+pip install psycopg2-binary
+```
+
+2. Create the database
+```bash
+createdb sequel
+```
+
+3. Load the schema
+```bash
+psql sequel < database/schema.sql
+```
+
+4. Insert sample data
+
+```bash
+psql sequel < database/sample_data.sql
+```
+
+5. Configure the backend (if needed)
+
+Open:
+```bash
+backend/app.py
+```
+Replace the PostgreSQL username with your local PostgreSQL username.
+
+
+6. Run the backend application
+```bash
+python backend/app.py
+```
+
