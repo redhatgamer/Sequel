@@ -222,18 +222,19 @@ table tbody tr:hover {
 
 .stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
     margin-bottom: 30px;
 }
 
 .stat-card {
     background: #16181f;
-    padding: 28px;
+    padding: 28px 20px;
     border-radius: 12px;
     text-align: center;
     border: 1px solid #1e2029;
     transition: all 0.2s ease;
+    overflow: hidden;
 }
 
 .stat-card:hover {
@@ -243,13 +244,14 @@ table tbody tr:hover {
 }
 
 .stat-card h3 {
-    font-size: 2.4em;
+    font-size: clamp(1.4em, 2.2vw, 2.4em);
     margin-bottom: 6px;
     font-weight: 700;
     background: linear-gradient(135deg, #6366f1, #a78bfa);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    word-break: break-word;
 }
 
 .stat-card p {
@@ -271,6 +273,12 @@ table tbody tr:hover {
 }
 
 /* ── Responsive ── */
+
+@media (max-width: 1024px) {
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
 
 @media (max-width: 768px) {
     .sidebar {
@@ -297,6 +305,10 @@ table tbody tr:hover {
     .main-content {
         margin-left: 64px;
         padding: 24px 20px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
     }
 }
 
