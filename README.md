@@ -1,67 +1,104 @@
 # Sequel
 
-Sequel is a prototype warehouse inventory management system. It is designed to track inventory items, warehouses, suppliers, employees, and transactions. The system uses a relational database to store and manage information related to inventory, storage locations, and sales activity within a warehouse environment.
+Sequel is a prototype warehouse inventory management system. It is designed to
+track inventory items, warehouses, suppliers, employees, and transactions. The
+system uses a relational database to store and manage information related to
+inventory, storage locations, and sales activity within a warehouse environment.
 
-The goal of the system is to organize warehouse operations. It allows inventory data to be stored, queried, and analyzed through database relationships and queries.
+The goal of the system is to organize warehouse operations. It allows inventory
+data to be stored, queried, and analyzed through database relationships and queries.
+
 ## Team Members
 
-
-Carlos Mejia
-
-Ashley Prado
-
-Gabriel Garcia
-
-Marcelo Hernandez Lopez
-
+- Carlos Mejia
+- Ashley Prado
+- Gabriel Garcia
+- Marcelo Hernandez Lopez
 
 ## Project Structure
 
-database/ – database schema, sample data, and SQL queries
-
-backend/ – Python code connecting to the SQLite database
-
-ui/ – user interface
-
-# Requirements
-
--Python 3
--PostgreSQL
--psycopg2 Python library
-
-# Setup Instructions
-1. Install the required Python library
-```bash
-pip install psycopg2-binary
+```text
+sequel/
+├── database/
+│   ├── schema.sql       # Table definitions
+│   ├── data.sql         # Seed data
+│   └── queries.sql      # Reporting queries
+├── backend/
+│   ├── app.py           # Flask API
+│   └── requirements.txt
+├── ui/                  # Frontend
+├── docker-compose.yml
+└── README.md
 ```
 
-2. Create the database
+## Requirements
+
+- Python 3.10+
+- PostgreSQL 14+ **or** [Docker](https://www.docker.com/) and Docker Compose
+
+## Database Setup
+
+### Docker (recommended)
+
+```bash
+docker compose up -d
+```
+
+This starts PostgreSQL and automatically loads the schema and seed data
+on first run. The database will be available at `localhost:5432`.
+
+To stop:
+
+```bash
+docker compose down
+```
+
+To wipe and re-seed the database:
+
+```bash
+docker compose down -v
+docker compose up -d
+```
+
+### Local PostgreSQL
+
+Create the database and load the schema and sample data:
+
 ```bash
 createdb sequel
-```
-
-3. Load the schema
-```bash
 psql sequel < database/schema.sql
+psql sequel < database/seed.sql
 ```
 
-4. Insert sample data
+If your PostgreSQL user is not `postgres`, open `backend/app.py` and update
+the `DB_USER` and `DB_PASSWORD` values in `get_db_connection()` to match
+your local credentials.
+
+## Backend Setup
+
+### 1. Create and activate a virtual environment
 
 ```bash
-psql sequel < database/sample_data.sql
+cd backend
+python -m venv venv
 ```
 
-5. Configure the backend (if needed)
+Activate it:
 
-Open:
+- **macOS/Linux:** `source venv/bin/activate`
+- **Windows (cmd):** `venv\Scripts\activate.bat`
+- **Windows (PowerShell):** `venv\Scripts\Activate.ps1`
+
+### 2. Install dependencies
+
 ```bash
-backend/app.py
+pip install -r requirements.txt
 ```
-Replace the PostgreSQL username with your local PostgreSQL username.
 
+### 3. Run the backend
 
-6. Run the backend application
 ```bash
-python backend/app.py
+python app.py
 ```
 
+The API will be available at <http://localhost:5000>.
