@@ -1,5 +1,6 @@
 import psycopg2
-from flask import Flask, jsonify
+import uuid
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -480,6 +481,68 @@ def supplier_inventory_summary():
     except Exception as e:
         print(e)
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/purchase", methods=["POST"])
+def purchase():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        data = request.get_json()
+        items = data["items"]
+
+        # start transaction
+        cursor.execute("SELECT id FROM person LIMIT 1")
+        first_customer = cursor.fetchone()
+        if not first_customer:
+            raise ValueError("No customers found")
+        customer_id = first_customer[0]
+
+        total = sum(item["quantity"] * item["price"] for item in items)
+
+        sale_id = str(uuid.uuid4())
+        cursor.execute(
+            "INSERT INTO sale (id, customer_id, date, total) VALUES (%s, %s, NOW(), %s)",
+            (sale_id, customer_id, total),
+        )
+
+        # insert sale, _and_ decrement item quantity
+        for item in items:
+            cursor.execute(
+                """INSERT INTO saleitem (id, sale_id, item_id, quantity, price) 
+                   VALUES (%s, %s, %s, %s, %s)""",
+                (
+                    str(uuid.uuid4()),
+                    sale_id,
+                    item["item_id"],
+                    item["quantity"],
+                    item["price"],
+                ),
+            )
+
+            cursor.execute(
+                """UPDATE inventoryitem 
+                   SET quantity_on_hand = quantity_on_hand - %s 
+                   WHERE id = %s AND quantity_on_hand >= %s""",
+                (item["quantity"], item["item_id"], item["quantity"]),
+            )
+
+            if cursor.rowcount == 0:
+                raise ValueError(f"Insufficient inventory for item {item['item_id']}")
+
+        # commit transaction
+        conn.commit()
+
+        return jsonify({"id": sale_id, "total": total, "status": "created"}), 201
+
+    except Exception as e:
+        conn.rollback()  # All-or-nothing rollback
+        return jsonify({"error": str(e)}), 400
+
+    finally:
+        cursor.close()
+        conn.close()
 
 
 if __name__ == "__main__":

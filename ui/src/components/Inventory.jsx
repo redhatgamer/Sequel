@@ -85,6 +85,7 @@ export default function Inventory() {
                 <th>Unit Price</th>
                 <th>Total Value</th>
                 <th>Status</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -101,6 +102,7 @@ export default function Inventory() {
                       : stockLevel(item.quantity_on_hand) === 'medium' ? 'Medium'
                       : 'In Stock'}
                   </span></td>
+                  <td><Button item={item} onPurchaseSuccess={setItems} /></td>
                 </tr>
               ))}
             </tbody>
@@ -108,5 +110,42 @@ export default function Inventory() {
         </div>
       )}
     </>
+  )
+}
+
+function Button({ item, onPurchaseSuccess }) {
+  const [purchasingId, setPurchasingId] = useState(null)
+
+  const handlePurchase = async () => {
+    setPurchasingId(item.id)
+    try {
+      const response = await fetch(`${API_URL}/purchase`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: [{ item_id: item.id, quantity: 1, price: item.unit_price }]
+        })
+      })
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Purchase failed')
+      }
+      const invResponse = await fetch(`${API_URL}/inventory`)
+      onPurchaseSuccess(await invResponse.json())
+    } catch (err) {
+      console.error('Purchase error:', err.message)
+      alert('Purchase failed: ' + err.message)
+    } finally {
+      setPurchasingId(null)
+    }
+  }
+
+  return (
+    <button
+      onClick={handlePurchase}
+      disabled={purchasingId === item.id || item.quantity_on_hand === 0}
+    >
+      {purchasingId === item.id ? 'Processing...' : 'Purchase'}
+    </button>
   )
 }
