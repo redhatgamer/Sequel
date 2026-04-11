@@ -5,17 +5,19 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+
 def get_db_connection():
     conn = psycopg2.connect(
         dbname="sequel",
         user="postgres",
         password="postgres",
         host="localhost",
-        port="5432"
+        port="5432",
     )
     return conn
 
-@app.route('/api/inventory', methods=['GET'])
+
+@app.route("/api/inventory", methods=["GET"])
 def get_inventory():
     try:
         conn = get_db_connection()
@@ -34,7 +36,7 @@ def get_inventory():
                 "name": row[1],
                 "quantity_on_hand": row[2],
                 "unit_price": float(row[3]) if row[3] else 0,
-                "sku": row[4]
+                "sku": row[4],
             }
             for row in rows
         ]
@@ -45,9 +47,10 @@ def get_inventory():
 
     except Exception as e:
         print(e)
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
-@app.route('/api/warehouses', methods=['GET'])
+
+@app.route("/api/warehouses", methods=["GET"])
 def get_warehouses():
     try:
         conn = get_db_connection()
@@ -67,7 +70,7 @@ def get_warehouses():
                 "code": row[1],
                 "street": row[2],
                 "city": row[3],
-                "state": row[4]
+                "state": row[4],
             }
             for row in rows
         ]
@@ -78,9 +81,10 @@ def get_warehouses():
 
     except Exception as e:
         print(e)
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
-@app.route('/api/suppliers', methods=['GET'])
+
+@app.route("/api/suppliers", methods=["GET"])
 def get_suppliers():
     try:
         conn = get_db_connection()
@@ -94,12 +98,7 @@ def get_suppliers():
         rows = cursor.fetchall()
 
         result = [
-            {
-                "id": row[0],
-                "name": row[1],
-                "email": row[2],
-                "phone": row[3]
-            }
+            {"id": row[0], "name": row[1], "email": row[2], "phone": row[3]}
             for row in rows
         ]
 
@@ -109,9 +108,10 @@ def get_suppliers():
 
     except Exception as e:
         print(e)
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
-@app.route('/api/storage-locations', methods=['GET'])
+
+@app.route("/api/storage-locations", methods=["GET"])
 def get_storage_locations():
     try:
         conn = get_db_connection()
@@ -132,7 +132,7 @@ def get_storage_locations():
                 "aisle": row[2],
                 "shelf": row[3],
                 "bin": row[4],
-                "warehouse_code": row[5]
+                "warehouse_code": row[5],
             }
             for row in rows
         ]
@@ -142,10 +142,10 @@ def get_storage_locations():
         return jsonify(result)
     except Exception as e:
         print(e)
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/employees', methods=['GET'])
+@app.route("/api/employees", methods=["GET"])
 def employees():
     try:
         conn = get_db_connection()
@@ -165,7 +165,7 @@ def employees():
                 "first_name": row[0],
                 "last_name": row[1],
                 "role": row[2],
-                "warehouse": row[3]
+                "warehouse": row[3],
             }
             for row in rows
         ]
@@ -175,10 +175,10 @@ def employees():
         return jsonify(result)
     except Exception as e:
         print(e)
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/low-stock', methods=['GET'])
+@app.route("/api/low-stock", methods=["GET"])
 def low_stock():
     try:
         conn = get_db_connection()
@@ -192,14 +192,7 @@ def low_stock():
 
         rows = cursor.fetchall()
 
-        result = [
-            {
-                "name": row[0],
-                "sku": row[1],
-                "quantity": row[2]
-            }
-            for row in rows
-        ]
+        result = [{"name": row[0], "sku": row[1], "quantity": row[2]} for row in rows]
 
         cursor.close()
         conn.close()
@@ -207,10 +200,10 @@ def low_stock():
 
     except Exception as e:
         print(e)
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/sales-history', methods=['GET'])
+@app.route("/api/sales-history", methods=["GET"])
 def sales_history():
     try:
         conn = get_db_connection()
@@ -230,7 +223,7 @@ def sales_history():
                 "first_name": row[1],
                 "last_name": row[2],
                 "date": str(row[3]),
-                "total": float(row[4])
+                "total": float(row[4]),
             }
             for row in rows
         ]
@@ -241,10 +234,10 @@ def sales_history():
 
     except Exception as e:
         print(e)
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/sales-items', methods=['GET'])
+@app.route("/api/sales-items", methods=["GET"])
 def sales_items():
     try:
         conn = get_db_connection()
@@ -263,7 +256,7 @@ def sales_items():
                 "sale_id": row[0],
                 "product": row[1],
                 "quantity": row[2],
-                "price": float(row[3])
+                "price": float(row[3]),
             }
             for row in rows
         ]
@@ -274,10 +267,10 @@ def sales_items():
 
     except Exception as e:
         print(e)
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/inventory-value', methods=['GET'])
+@app.route("/api/inventory-value", methods=["GET"])
 def inventory_value():
     try:
         conn = get_db_connection()
@@ -296,10 +289,10 @@ def inventory_value():
 
     except Exception as e:
         print(e)
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/customer-sales', methods=['GET'])
+@app.route("/api/customer-sales", methods=["GET"])
 def customer_sales():
     try:
         conn = get_db_connection()
@@ -320,7 +313,7 @@ def customer_sales():
                 "first_name": row[0],
                 "last_name": row[1],
                 "orders": row[2],
-                "lifetime_value": float(row[3])
+                "lifetime_value": float(row[3]),
             }
             for row in rows
         ]
@@ -331,10 +324,10 @@ def customer_sales():
 
     except Exception as e:
         print(e)
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/warehouse-value', methods=['GET'])
+@app.route("/api/warehouse-value", methods=["GET"])
 def warehouse_value():
     try:
         conn = get_db_connection()
@@ -352,11 +345,7 @@ def warehouse_value():
         rows = cursor.fetchall()
 
         result = [
-            {
-                "warehouse": row[0],
-                "item_count": row[1],
-                "value": float(row[2])
-            }
+            {"warehouse": row[0], "item_count": row[1], "value": float(row[2])}
             for row in rows
         ]
 
@@ -366,10 +355,10 @@ def warehouse_value():
 
     except Exception as e:
         print(e)
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/order-fulfillment', methods=['GET'])
+@app.route("/api/order-fulfillment", methods=["GET"])
 def order_fulfillment():
     try:
         conn = get_db_connection()
@@ -403,7 +392,7 @@ def order_fulfillment():
                 "quantity": row[3],
                 "warehouse": row[4],
                 "location": row[5],
-                "processed_by": row[6]
+                "processed_by": row[6],
             }
             for row in rows
         ]
@@ -414,10 +403,10 @@ def order_fulfillment():
 
     except Exception as e:
         print(e)
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/refunds', methods=['GET'])
+@app.route("/api/refunds", methods=["GET"])
 def refunds():
     try:
         conn = get_db_connection()
@@ -436,7 +425,7 @@ def refunds():
                 "refund_id": row[0],
                 "date": str(row[1]),
                 "total": float(row[2]),
-                "sale_id": row[3]
+                "sale_id": row[3],
             }
             for row in rows
         ]
@@ -447,10 +436,10 @@ def refunds():
 
     except Exception as e:
         print(e)
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/supplier-inventory-summary', methods=['GET'])
+@app.route("/api/supplier-inventory-summary", methods=["GET"])
 def supplier_inventory_summary():
     try:
         conn = get_db_connection()
@@ -494,7 +483,7 @@ def supplier_inventory_summary():
                 "supplier_email": row[5],
                 "warehouse": row[6],
                 "supplier_item_count": row[7],
-                "supplier_total_units": row[8]
+                "supplier_total_units": row[8],
             }
             for row in rows
         ]
@@ -504,7 +493,8 @@ def supplier_inventory_summary():
         return jsonify(result)
     except Exception as e:
         print(e)
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
-    app.run(debug=True, host='localhost', port=5000)
+    app.run(debug=True, host="localhost", port=5000)
