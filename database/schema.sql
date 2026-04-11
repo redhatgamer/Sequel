@@ -127,3 +127,23 @@ CREATE TABLE Refund
     total   DECIMAL(10, 2),
     FOREIGN KEY (sale_id) REFERENCES Sale (id)
 );
+
+-- view to get sales and their details
+CREATE VIEW v_sales_with_details AS
+SELECT sale.id AS sale_id,
+    person.first_name || ' ' || person.last_name AS customer,
+    inventoryitem.name AS product,
+    saleitem.quantity,
+    saleitem.price,
+    saleitem.quantity * saleitem.price AS line_total,
+    warehouse.code AS fulfilled_from,
+    storagelocation.aisle || '-' || storagelocation.shelf || '-' || storagelocation.bin AS location,
+    employee.role AS processed_by_role,
+    sale.date
+FROM sale
+    JOIN person ON sale.customer_id = person.id
+    JOIN saleitem ON sale.id = saleitem.sale_id
+    JOIN inventoryitem ON saleitem.item_id = inventoryitem.id
+    JOIN warehouse ON inventoryitem.warehouse_id = warehouse.id
+    JOIN storagelocation ON inventoryitem.storage_location_id = storagelocation.id
+    LEFT JOIN employee ON warehouse.id = employee.warehouse_id;

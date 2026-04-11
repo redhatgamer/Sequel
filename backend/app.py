@@ -365,44 +365,30 @@ def order_fulfillment():
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT sale.id,
-                   person.first_name || ' ' || person.last_name,
-                   inventoryitem.name,
-                   saleitem.quantity,
-                   warehouse.code,
-                   storagelocation.aisle || '-' || storagelocation.shelf || '-' || storagelocation.bin,
-                   employee.role
-            FROM sale
-            JOIN person ON sale.customer_id = person.id
-            JOIN saleitem ON sale.id = saleitem.sale_id
-            JOIN inventoryitem ON saleitem.item_id = inventoryitem.id
-            JOIN warehouse ON inventoryitem.warehouse_id = warehouse.id
-            JOIN storagelocation ON inventoryitem.storage_location_id = storagelocation.id
-            LEFT JOIN employee ON warehouse.id = employee.warehouse_id
-            WHERE sale.date > NOW() - INTERVAL '30 days'
+            SELECT * FROM v_sales_with_details
+            WHERE date > NOW() - INTERVAL '30 days'
         """)
 
         rows = cursor.fetchall()
-
-        result = [
-            {
-                "sale_id": row[0],
-                "customer": row[1],
-                "product": row[2],
-                "quantity": row[3],
-                "warehouse": row[4],
-                "location": row[5],
-                "processed_by": row[6],
-            }
-            for row in rows
+        columns = [
+            "sale_id",
+            "customer",
+            "product",
+            "quantity",
+            "price",
+            "line_total",
+            "fulfilled_from",
+            "location",
+            "processed_by_role",
+            "date",
         ]
+
+        result = [dict(zip(columns, row)) for row in rows]
 
         cursor.close()
         conn.close()
         return jsonify(result)
-
     except Exception as e:
-        print(e)
         return jsonify({"error": str(e)}), 500
 
 
